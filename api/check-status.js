@@ -3,11 +3,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { amount, method } = req.body;
+  const { amount } = req.body;
 
   try {
     const response = await fetch(
-      "https://app.pakasir.com/api/transactioncreate",
+      "https://app.pakasir.com/api/transactioncreate/qris",
       {
         method: "POST",
         headers: {
@@ -18,16 +18,15 @@ export default async function handler(req, res) {
           project: process.env.PAKASIR_SLUG,
           order_id: "INV-" + Date.now(),
           amount: amount,
-          method: method,
           api_key: process.env.PAKASIR_API_KEY
         })
       }
     );
 
-    const data = await response.json();
-    return res.status(200).json(data);
+    const text = await response.text();
+    return res.status(response.status).send(text);
 
   } catch (err) {
-    return res.status(500).json({ error: "Proxy error" });
+    return res.status(500).json({ error: err.toString() });
   }
 }

@@ -1,9 +1,13 @@
 export default async function handler(req, res) {
-  const { order_id } = req.query;
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { amount, method } = req.body;
 
   try {
     const response = await fetch(
-      "https://app.pakasir.com/api/transactiondetail",
+      "https://app.pakasir.com/api/transactioncreate",
       {
         method: "POST",
         headers: {
@@ -12,7 +16,9 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           project: process.env.PAKASIR_SLUG,
-          order_id: order_id,
+          order_id: "INV-" + Date.now(),
+          amount: amount,
+          method: method,
           api_key: process.env.PAKASIR_API_KEY
         })
       }
